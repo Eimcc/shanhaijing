@@ -1,0 +1,1300 @@
+/* ========================================
+ * 山海经·异兽录 - 样式表
+ * ========================================
+ * 说明：本项目所有CSS样式
+ * 维护：修改样式只需编辑此文件
+ * ======================================== */
+
+/* ---------- 基础变量与重置 ---------- */
+        /* ========== CSS Reset & Base ========== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #1a1520;
+            --bg-card: rgba(26, 21, 32, 0.85);
+            --bg-modal: rgba(10, 10, 15, 0.95);
+            --gold: #c9a96e;
+            --gold-light: #e8d5a3;
+            --gold-dim: #8a7345;
+            --red: #c0392b;
+            --red-light: #e74c3c;
+            --text-primary: #e8e0d0;
+            --text-secondary: #a09888;
+            --text-dim: #6a6058;
+            --border: rgba(201, 169, 110, 0.2);
+            --border-hover: rgba(201, 169, 110, 0.5);
+            --shadow: rgba(0, 0, 0, 0.5);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.8;
+        }
+
+        /* ========== Background Texture ========== */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(201, 169, 110, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(192, 57, 43, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(201, 169, 110, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ========== Ink Mist Particles ========== */
+        .mist-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .mist {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(201, 169, 110, 0.04) 0%, transparent 70%);
+            animation: mistFloat linear infinite;
+        }
+
+        @keyframes mistFloat {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+        }
+
+/* ---------- 英雄区域 ---------- */
+        /* ========== Header / Hero ========== */
+        .hero {
+            position: relative;
+            text-align: center;
+            padding: 80px 20px 60px;
+            z-index: 1;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            width: 80%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-dim), var(--gold), var(--gold-dim), transparent);
+        }
+
+        .hero-subtitle {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 14px;
+            letter-spacing: 8px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .hero-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: clamp(48px, 8vw, 80px);
+            font-weight: 900;
+            background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 50%, var(--gold-dim) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 12px;
+            margin-bottom: 16px;
+            text-shadow: none;
+        }
+
+        .hero-desc {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 16px;
+            color: var(--text-secondary);
+            letter-spacing: 4px;
+        }
+
+        /* ---------- 标题下方控制栏 ---------- */
+        .hero-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        /* ---------- 风格切换开关 ---------- */
+        .style-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .style-switch-track {
+            position: relative;
+            width: 64px;
+            height: 32px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d1f3d 50%, #1a1525 100%);
+            border: 1px solid rgba(201, 169, 110, 0.2);
+            transition: all 0.5s ease;
+            overflow: hidden;
+        }
+
+        .style-switch-track::before {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 13px;
+            background: radial-gradient(circle at 30% 30%, rgba(201, 169, 110, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .style-switch.active .style-switch-track {
+            background: linear-gradient(135deg, #f5f0e8 0%, #e8e0d0 50%, #d4c5a9 100%);
+            border-color: rgba(100, 80, 50, 0.3);
+        }
+
+        .style-switch-icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 13px;
+            transition: all 0.4s ease;
+            z-index: 1;
+            line-height: 1;
+        }
+
+        .style-ink {
+            left: 9px;
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+
+        .style-line {
+            right: 9px;
+            opacity: 0.3;
+            transform: translateY(-50%) scale(0.7);
+        }
+
+        .style-switch.active .style-ink {
+            opacity: 0.3;
+            transform: translateY(-50%) scale(0.7);
+        }
+
+        .style-switch.active .style-line {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+
+        .style-switch-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #2a2035, #1a1525);
+            border: 1px solid rgba(201, 169, 110, 0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(201, 169, 110, 0.1);
+            transition: all 0.5s cubic-bezier(0.68, -0.15, 0.27, 1.15);
+            z-index: 2;
+        }
+
+        .style-switch.active .style-switch-thumb {
+            left: 35px;
+            background: radial-gradient(circle at 35% 35%, #fff, #f0e8d8);
+            border-color: rgba(100, 80, 50, 0.2);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15), inset 0 1px 2px rgba(255,255,255,0.8);
+        }
+
+        .style-switch-label {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            transition: color 0.3s;
+            min-width: 56px;
+        }
+
+        .style-switch:hover .style-switch-label {
+            color: var(--gold);
+        }
+
+        /* Decorative mountain SVG */
+        .hero-mountains {
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+/* ---------- 筛选标签 ---------- */
+        /* ========== Filter Tags ========== */
+        .filter-section {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 40px 20px 20px;
+        }
+
+        .filter-tag {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 14px;
+            padding: 8px 24px;
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 2px;
+        }
+
+        .filter-tag:hover {
+            border-color: var(--border-hover);
+            color: var(--gold);
+        }
+
+        .filter-tag.active {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(201, 169, 110, 0.1);
+            box-shadow: 0 0 20px rgba(201, 169, 110, 0.1);
+        }
+
+        /* ========== Stats Bar ========== */
+        .stats-bar {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 10px 20px 30px;
+            font-size: 13px;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+        }
+
+        .stats-bar span {
+            color: var(--gold-dim);
+        }
+
+/* ---------- 卡片网格 ---------- */
+        /* ========== Card Grid ========== */
+        .card-grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 40px 80px;
+        }
+
+        /* ========== Creature Card ========== */
+        .creature-card {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .creature-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .creature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--border-hover);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(201, 169, 110, 0.08);
+        }
+
+        .card-image-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            overflow: hidden;
+        }
+
+        .card-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .creature-card:hover .card-image-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .card-image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 15, 0);
+            transition: background 0.3s ease;
+            pointer-events: none;
+        }
+
+        .creature-card:hover .card-image-overlay {
+            background: rgba(10, 10, 15, 0.6);
+        }
+
+        .card-type-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 9px;
+            padding: 2px 6px;
+            border: 1px solid rgba(201, 169, 110, 0.3);
+            border-radius: 2px;
+            color: var(--gold);
+            background: rgba(10, 10, 15, 0.7);
+            letter-spacing: 1px;
+            backdrop-filter: blur(4px);
+        }
+
+        .card-info {
+            padding: 8px 12px 10px;
+        }
+
+        .card-name {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gold-light);
+            margin-bottom: 0;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .card-alias,
+        .card-brief,
+        .card-footer {
+            display: none;
+        }
+
+/* ---------- 卡片悬停提示 ---------- */
+        .card-hover-hint {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 14px;
+            color: var(--gold-light);
+            letter-spacing: 3px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            text-shadow: 0 0 20px rgba(201, 169, 110, 0.5);
+            white-space: nowrap;
+            z-index: 10;
+            background: rgba(10, 10, 15, 0.5);
+            border-radius: 4px;
+        }
+
+        .creature-card:hover .card-hover-hint {
+            opacity: 1;
+        }
+
+        .card-danger {
+            font-size: 12px;
+            color: var(--red-light);
+            letter-spacing: 1px;
+        }
+
+        .card-location {
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        .card-click-hint {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            font-size: 11px;
+            color: var(--gold-dim);
+            opacity: 0;
+            transition: opacity 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .creature-card:hover .card-click-hint {
+            opacity: 1;
+        }
+
+/* ---------- 弹窗详情 ---------- */
+        /* ========== Modal ========== */
+        /* ---------- 弹窗遮罩 ---------- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 8, 0.85);
+            backdrop-filter: blur(16px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 24px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* ---------- 弹窗容器 ---------- */
+        .modal-content {
+            position: relative;
+            background: #0e0b14;
+            border: 1px solid rgba(201, 169, 110, 0.1);
+            border-radius: 12px;
+            max-width: 560px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            transform: translateY(24px);
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-content::-webkit-scrollbar { width: 4px; }
+        .modal-content::-webkit-scrollbar-track { background: transparent; }
+        .modal-content::-webkit-scrollbar-thumb { background: rgba(201, 169, 110, 0.15); border-radius: 2px; }
+
+        /* ---------- 关闭按钮 ---------- */
+        .modal-close {
+            position: fixed;
+            top: 24px;
+            right: 28px;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 12px;
+            color: var(--text-dim);
+            background: rgba(10, 10, 15, 0.5);
+            border: 1px solid rgba(201, 169, 110, 0.1);
+            padding: 6px 16px;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+            border-radius: 4px;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-close:hover {
+            color: var(--gold);
+            border-color: rgba(201, 169, 110, 0.3);
+        }
+
+        /* ---------- 顶部英雄区（图文 3:7） ---------- */
+        .modal-hero {
+            display: flex;
+            gap: 0;
+            padding: 0;
+        }
+
+        .modal-hero-image {
+            width: 36%;
+            min-height: 320px;
+            flex-shrink: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .modal-hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+
+        /* ---------- 弹窗图片风格切换按钮 ---------- */
+        .modal-img-toggle {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid rgba(201, 169, 110, 0.3);
+            background: rgba(14, 11, 20, 0.6);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 3;
+            padding: 0;
+            opacity: 0;
+        }
+
+        .modal-hero-image:hover .modal-img-toggle {
+            opacity: 1;
+        }
+
+        .modal-img-toggle:hover {
+            border-color: var(--gold);
+            background: rgba(201, 169, 110, 0.2);
+            transform: scale(1.15);
+            box-shadow: 0 0 12px rgba(201, 169, 110, 0.2);
+        }
+
+        .modal-img-toggle-icon {
+            font-size: 15px;
+            line-height: 1;
+        }
+
+        .modal-hero-image::after {
+            display: none;
+        }
+
+        .modal-hero-info {
+            flex: 1;
+            padding: 40px 36px 36px 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* 字号阶梯：名字 32px > 别名 13px > 标签 11px */
+        .modal-name {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--gold-light);
+            letter-spacing: 6px;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .modal-alias {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        /* ---------- 标签组 ---------- */
+        .modal-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .modal-tag {
+            display: inline-block;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 11px;
+            padding: 3px 10px;
+            border: 1px solid rgba(201, 169, 110, 0.15);
+            border-radius: 3px;
+            background: rgba(201, 169, 110, 0.03);
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        .modal-tag-danger {
+            color: var(--red-light);
+            border-color: rgba(255, 100, 100, 0.15);
+            background: rgba(255, 100, 100, 0.03);
+        }
+
+        /* 可点击标签 */
+        .modal-tag.modal-link {
+            cursor: pointer;
+            color: var(--gold);
+            border-color: rgba(201, 169, 110, 0.2);
+            background: rgba(201, 169, 110, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .modal-tag.modal-link:hover {
+            border-color: var(--gold);
+            color: var(--gold-light);
+            background: rgba(201, 169, 110, 0.1);
+        }
+
+        /* ---------- 详情区 ---------- */
+        .modal-detail {
+            padding: 0 32px 36px;
+        }
+
+        /* ---------- 标签切换 ---------- */
+        .modal-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid rgba(201, 169, 110, 0.12);
+            margin-bottom: 28px;
+        }
+
+        .modal-tab {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 13px;
+            color: var(--text-dim);
+            background: none;
+            border: none;
+            padding: 12px 24px;
+            cursor: pointer;
+            letter-spacing: 3px;
+            transition: all 0.3s;
+            position: relative;
+            opacity: 0.5;
+        }
+
+        .modal-tab::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 24px;
+            right: 24px;
+            height: 2px;
+            background: transparent;
+            transition: all 0.3s;
+            border-radius: 1px;
+        }
+
+        .modal-tab.active {
+            color: var(--gold);
+            opacity: 1;
+        }
+
+        .modal-tab.active::after {
+            background: var(--gold);
+            box-shadow: 0 0 8px rgba(201, 169, 110, 0.3);
+        }
+
+        .modal-tab:hover {
+            color: var(--gold-dim);
+            opacity: 0.8;
+        }
+
+        /* ---------- 面板切换 ---------- */
+        .modal-panel {
+            display: none;
+        }
+
+        .modal-panel.active {
+            display: block;
+        }
+
+        /* ---------- 信息卡片 ---------- */
+        .modal-info-card {
+            background: rgba(201, 169, 110, 0.02);
+            border: 1px solid rgba(201, 169, 110, 0.06);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+        }
+
+        .modal-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-info-label {
+            font-size: 11px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        .modal-info-value {
+            font-size: 13px;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+        }
+
+        /* ---------- 描述段落 ---------- */
+        .modal-desc-section {
+            margin-bottom: 24px;
+        }
+
+        .modal-desc-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .modal-desc-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 12px;
+            color: var(--gold-dim);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .modal-desc-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 2;
+        }
+
+        /* ---------- 古籍引用卡片 ---------- */
+        .modal-quote-card {
+            background: rgba(201, 169, 110, 0.02);
+            border: 1px solid rgba(201, 169, 110, 0.06);
+            border-radius: 6px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .modal-quote-text {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 15px;
+            color: var(--text-primary);
+            line-height: 2.2;
+            font-style: italic;
+            margin-bottom: 12px;
+        }
+
+        .modal-quote-source {
+            font-size: 11px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+/* ---------- 页脚 ---------- */
+        /* ========== Footer ========== */
+        .footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px 20px 60px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 18px;
+            color: var(--gold-dim);
+            letter-spacing: 6px;
+            margin-bottom: 8px;
+        }
+
+        .footer-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+        }
+
+/* ---------- 响应式适配 ---------- */
+        /* ========== Responsive ========== */
+        @media (max-width: 1024px) {
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 60px 20px 40px;
+            }
+
+            .hero-title {
+                letter-spacing: 6px;
+            }
+
+            .hero-controls {
+                gap: 12px;
+            }
+
+            .card-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 10px;
+                padding: 20px 20px 60px;
+            }
+
+            /* 弹窗移动端适配 */
+            .modal-content {
+                max-width: 100%;
+                border-radius: 16px 16px 0 0;
+                max-height: 92vh;
+                margin: 0;
+            }
+
+            .modal-overlay {
+                align-items: flex-end;
+                padding: 0;
+            }
+
+            .modal-header {
+                flex-direction: column;
+            }
+
+            .modal-image {
+                width: 100%;
+                min-height: 300px;
+                max-height: 350px;
+            }
+
+            .modal-hero {
+                flex-direction: column;
+            }
+
+            .modal-hero-image {
+                width: 100%;
+                min-height: 220px;
+                max-height: 280px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .modal-hero-image img {
+                width: auto;
+                height: 100%;
+                max-width: 80%;
+                object-fit: contain;
+            }
+
+            .modal-hero-image::after {
+                display: none;
+            }
+
+            .modal-hero-info {
+                padding: 24px 24px;
+            }
+
+            .modal-detail {
+                padding: 0 24px 30px;
+            }
+
+            .modal-name {
+                font-size: 26px;
+                letter-spacing: 4px;
+            }
+
+            .filter-section {
+                gap: 8px;
+                padding: 30px 16px 16px;
+            }
+
+            .filter-tag {
+                font-size: 12px;
+                padding: 6px 16px;
+            }
+
+            .modal-close {
+                top: 12px;
+                right: 12px;
+            }
+
+            .modal-img-toggle {
+                opacity: 1;
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2.2rem;
+                letter-spacing: 4px;
+            }
+
+            .hero-subtitle {
+                font-size: 12px;
+                letter-spacing: 3px;
+            }
+
+            .hero-desc {
+                font-size: 13px;
+                letter-spacing: 2px;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+                padding: 16px 16px 40px;
+            }
+
+            .modal-hero-image {
+                min-height: 180px;
+                max-height: 240px;
+            }
+
+            .modal-name {
+                font-size: 22px;
+            }
+
+            .modal-hero-info {
+                padding: 20px 20px;
+            }
+
+            .modal-detail {
+                padding: 0 20px 24px;
+            }
+        }
+
+/* ---------- 动画关键帧 ---------- */
+        /* ========== Animations ========== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-subtitle {
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .hero-title {
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .hero-desc {
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+
+        /* ========== Card Hidden State ========== */
+        .creature-card.hidden {
+            display: none;
+        }
+
+/* ---------- 地图区域 ---------- */
+        /* ========== Map Section ========== */
+        .map-section {
+            max-width: 1100px;
+            margin: 0 auto 3rem;
+            padding: 0 2rem;
+            position: relative;
+        }
+
+        .map-toggle-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--gold-dim);
+            padding: 0.5rem 1.5rem;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.9rem;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .map-toggle-btn:hover,
+        .map-toggle-btn.active {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(201, 169, 110, 0.08);
+            box-shadow: 0 0 20px rgba(201, 169, 110, 0.08);
+        }
+
+        .hero-map-btn {
+            display: block;
+            margin: 1.5rem auto 0;
+            animation: fadeInUp 0.8s ease 0.8s both;
+        }
+
+        .map-container {
+            position: relative;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease;
+            opacity: 0;
+        }
+
+        .map-container.active {
+            max-height: 900px;
+            opacity: 1;
+        }
+
+        .map-wrapper {
+            background: linear-gradient(135deg, rgba(26, 21, 32, 0.9) 0%, rgba(15, 12, 20, 0.95) 100%);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 2rem 1.5rem 1.5rem;
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(201, 169, 110, 0.05);
+        }
+
+        .map-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-dim), var(--gold), var(--gold-dim), transparent);
+        }
+
+        .map-wrapper::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 15%;
+            right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201, 169, 110, 0.1), transparent);
+        }
+
+        .map-title {
+            text-align: center;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.1rem;
+            color: var(--gold);
+            letter-spacing: 0.3em;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            text-shadow: 0 0 20px rgba(201, 169, 110, 0.15);
+        }
+
+        .map-svg-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .map-svg-container svg {
+            width: 100%;
+            height: auto;
+        }
+
+        .map-province {
+            fill: rgba(201, 169, 110, 0.05);
+            stroke: rgba(201, 169, 110, 0.25);
+            stroke-width: 0.6;
+            cursor: pointer;
+            transition: fill 0.3s ease, stroke 0.3s ease, stroke-width 0.3s ease, filter 0.3s ease;
+        }
+
+        .map-province:hover,
+        .map-province.highlight {
+            fill: rgba(201, 169, 110, 0.15);
+            stroke: var(--gold);
+            stroke-width: 1;
+            filter: drop-shadow(0 0 8px rgba(201, 169, 110, 0.25));
+        }
+
+        .map-province.active {
+            fill: rgba(201, 169, 110, 0.22);
+            stroke: var(--gold-light);
+            stroke-width: 1.2;
+            filter: drop-shadow(0 0 12px rgba(201, 169, 110, 0.35));
+        }
+
+        .map-province-bg {
+            fill: rgba(201, 169, 110, 0.02);
+            stroke: rgba(201, 169, 110, 0.08);
+            stroke-width: 0.4;
+            pointer-events: none;
+        }
+
+        .map-tooltip {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(10, 10, 15, 0.95) 0%, rgba(20, 16, 28, 0.98) 100%);
+            border: 1px solid var(--gold);
+            color: var(--text-primary);
+            padding: 0.6rem 1rem;
+            border-radius: 4px;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.85rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 100;
+            white-space: nowrap;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(201, 169, 110, 0.1);
+        }
+
+        .map-tooltip.visible {
+            opacity: 1;
+        }
+
+        .map-tooltip .tooltip-province {
+            color: var(--gold);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+        }
+
+        .map-tooltip .tooltip-count {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 0.2rem;
+        }
+
+        .map-tooltip .tooltip-count span {
+            color: var(--gold-light);
+            font-weight: 700;
+        }
+
+        .map-clear-btn {
+            display: none;
+            margin: 0.75rem auto 0;
+            padding: 0.4rem 1.2rem;
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .map-clear-btn.visible {
+            display: block;
+        }
+
+        .map-clear-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        @media (max-width: 768px) {
+            .map-section { padding: 0 1rem; }
+            .map-wrapper { padding: 1.5rem 1rem 1rem; }
+            .map-title { font-size: 0.95rem; }
+        }
+
+        /* ========== 趣味交互效果 ========== */
+        /* ========== Fun Interactive Effects ========== */
+
+        /* 墨迹粒子容器 */
+        .ink-particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        /* 墨迹粒子 */
+        .ink-particle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(201, 169, 110, 0.6) 0%, rgba(201, 169, 110, 0.2) 60%, transparent 100%);
+            pointer-events: none;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            transform: scale(1);
+        }
+
+        /* 墨点飞溅 */
+        .ink-splash {
+            position: fixed;
+            border-radius: 50%;
+            background: var(--gold);
+            pointer-events: none;
+            z-index: 9999;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            opacity: 0.7;
+        }
+
+        .ink-splash.title-burst {
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translate(var(--tx), var(--ty));
+        }
+
+        /* 标题波动动画 */
+        .hero-title {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .hero-title:hover {
+            transform: scale(1.02);
+        }
+
+        .hero-title.wave {
+            animation: titleWave 0.6s ease;
+        }
+
+        @keyframes titleWave {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.02) rotate(-1deg); }
+            50% { transform: scale(1.03) rotate(0deg); }
+            75% { transform: scale(1.02) rotate(1deg); }
+        }
+
+        /* 卡片悬浮飘动 */
+        .creature-card {
+            animation: cardFloat 4s ease-in-out infinite;
+            animation-delay: calc(var(--float-delay, 0) * 0.5s);
+        }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        .creature-card:hover {
+            animation-play-state: paused;
+        }
+
+        /* 卡片入场涟漪效果 */
+        .creature-card.visible::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(circle at center, rgba(201, 169, 110, 0.1) 0%, transparent 70%);
+            animation: cardRipple 0.8s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes cardRipple {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.2); opacity: 0; }
+        }
+    
