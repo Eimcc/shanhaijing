@@ -3733,6 +3733,128 @@
             return creature.image; // 默认水墨写意
         }
 
+        // 获取缩略图路径（卡片列表用）
+        function getThumbSrc(creature) {
+            const src = getImageSrc(creature);
+            // 从 images/xxx.jpg 或 qqggimg/xxx.jpg 提取文件名
+            const filename = src.split('/').pop();
+            return `thumbnails/${filename}`;
+        }
+
+        // ========== 分批懒加载 ==========
+        const BATCH_SIZE = 30;
+        let pendingCreatures = [];
+        let isLoadingMore = false;
+        let loadMoreObserver = null;
+
+        function createLoadMoreSentinel() {
+            // 移除旧的哨兵
+            const old = document.getElementById('loadMoreSentinel');
+            if (old) old.remove();
+
+            const sentinel = document.createElement('div');
+            sentinel.id = 'loadMoreSentinel';
+            sentinel.style.cssText = 'height:1px;width:100%;';
+            cardGrid.appendChild(sentinel);
+            return sentinel;
+        }
+
+        function setupLoadMoreObserver() {
+            if (loadMoreObserver) loadMoreObserver.disconnect();
+
+            loadMoreObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && pendingCreatures.length > 0 && !isLoadingMore) {
+                        loadNextBatch();
+                    }
+                });
+            }, { rootMargin: '200px' });
+
+            const sentinel = document.getElementById('loadMoreSentinel');
+            if (sentinel) loadMoreObserver.observe(sentinel);
+        }
+
+        function loadNextBatch() {
+            if (pendingCreatures.length === 0 || isLoadingMore) return;
+            isLoadingMore = true;
+
+            const batch = pendingCreatures.splice(0, BATCH_SIZE);
+            const startIndex = parseInt(cardGrid.dataset.loadedCount || '0');
+
+            batch.forEach((creature, i) => {
+                const card = createCreatureCard(creature, startIndex + i);
+                cardGrid.insertBefore(card, document.getElementById('loadMoreSentinel'));
+                setTimeout(() => card.classList.add('visible'), 60 * (i + 1));
+            });
+
+            cardGrid.dataset.loadedCount = startIndex + batch.length;
+            updateVisibleCount();
+
+            // 如果还有待加载的，确保哨兵存在
+            if (pendingCreatures.length > 0) {
+                if (!document.getElementById('loadMoreSentinel')) {
+                    createLoadMoreSentinel();
+                    setupLoadMoreObserver();
+                }
+            } else {
+                // 全部加载完毕，移除哨兵
+                const sentinel = document.getElementById('loadMoreSentinel');
+                if (sentinel) sentinel.remove();
+                if (loadMoreObserver) loadMoreObserver.disconnect();
+            }
+
+            isLoadingMore = false;
+        }
+
+        function createCreatureCard(creature, index) {
+            const card = document.createElement('div');
+            card.className = 'creature-card';
+            card.dataset.id = creature.id;
+            card.innerHTML = `
+                <div class="card-image-wrapper">
+                    <img src="${getThumbSrc(creature)}" alt="${creature.name}" loading="lazy">
+                    <div class="card-image-overlay"></div>
+                    <span class="card-type-badge">${creature.type}</span>
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">${creature.name}</h3>
+                </div>
+                <div class="card-hover-hint">点击查看详情</div>
+            `;
+            card.style.setProperty('--float-delay', Math.floor(Math.random() * 8));
+            card.addEventListener('click', () => openModal(creature));
+            return card;
+        }
+
+        function startLazyRender(creatureList) {
+            // 清空卡片区域
+            cardGrid.innerHTML = '';
+            cardGrid.dataset.loadedCount = '0';
+            cardGrid.dataset.totalCount = creatureList.length;
+
+            // 重置待加载队列
+            pendingCreatures = [...creatureList];
+            isLoadingMore = false;
+
+            // 创建哨兵并启动观察器
+            createLoadMoreSentinel();
+            setupLoadMoreObserver();
+
+            // 加载第一批
+            loadNextBatch();
+        }
+
+        function updateVisibleCount() {
+            const loaded = parseInt(cardGrid.dataset.loadedCount || '0');
+            const total = parseInt(cardGrid.dataset.totalCount || '0');
+            const el = document.getElementById('visibleCount');
+            if (loaded >= total) {
+                el.textContent = total;
+            } else {
+                el.textContent = `${loaded}/${total}`;
+            }
+        }
+
         // 切换风格
         function toggleStyle() {
             currentStyle = currentStyle === 'ink' ? 'line' : 'ink';
@@ -3823,38 +3945,8 @@
 
         // ========== 卡片渲染（地图筛选） ==========
         function renderCardsByProvince(ids) {
-            const cardGrid = document.getElementById('cardGrid');
-            cardGrid.innerHTML = '';
-            let visibleCount = 0;
-
-            ids.forEach((id, index) => {
-                const creature = creatures.find(c => c.id === id);
-                if (!creature) return;
-                visibleCount++;
-
-                const card = document.createElement('div');
-                card.className = 'creature-card';
-                card.dataset.id = creature.id;
-                card.innerHTML = `
-                    <div class="card-image-wrapper">
-                        <img src="${getImageSrc(creature)}" alt="${creature.name}" loading="lazy">
-                        <div class="card-image-overlay"></div>
-                        <span class="card-type-badge">${creature.type}</span>
-                    </div>
-                    <div class="card-info">
-                        <h3 class="card-name">${creature.name}</h3>
-                    </div>
-                    <div class="card-hover-hint">点击查看详情</div>
-                `;
-                // 添加随机飘动延迟
-                card.style.setProperty('--float-delay', Math.floor(Math.random() * 8));
-                card.addEventListener('click', () => openModal(creature));
-                cardGrid.appendChild(card);
-
-                setTimeout(() => card.classList.add('visible'), 80 * visibleCount);
-            });
-
-            document.getElementById('visibleCount').textContent = visibleCount;
+            const filtered = ids.map(id => creatures.find(c => c.id === id)).filter(Boolean);
+            startLazyRender(filtered);
         }
 
         function clearMapFilter() {
@@ -3873,41 +3965,10 @@
         const cardGrid = document.getElementById('cardGrid');
 
         function renderCards(filter = 'all') {
-            cardGrid.innerHTML = '';
-            let visibleCount = 0;
-
-            creatures.forEach((creature, index) => {
-                const show = filter === 'all' || creature.type === filter;
-                if (!show) return;
-                visibleCount++;
-
-                const card = document.createElement('div');
-                card.className = 'creature-card';
-                card.dataset.id = creature.id;
-                card.innerHTML = `
-                    <div class="card-image-wrapper">
-                        <img src="${getImageSrc(creature)}" alt="${creature.name}" loading="lazy">
-                        <div class="card-image-overlay"></div>
-                        <span class="card-type-badge">${creature.type}</span>
-                    </div>
-                    <div class="card-info">
-                        <h3 class="card-name">${creature.name}</h3>
-                    </div>
-                    <div class="card-hover-hint">点击查看详情</div>
-                `;
-
-                // 添加随机飘动延迟
-                card.style.setProperty('--float-delay', Math.floor(Math.random() * 8));
-                card.addEventListener('click', () => openModal(creature));
-                cardGrid.appendChild(card);
-
-                // Staggered animation
-                setTimeout(() => {
-                    card.classList.add('visible');
-                }, 80 * visibleCount);
-            });
-
-            document.getElementById('visibleCount').textContent = visibleCount;
+            const filtered = filter === 'all'
+                ? creatures
+                : creatures.filter(c => c.type === filter);
+            startLazyRender(filtered);
         }
 
         // ========== 弹窗详情 ==========
