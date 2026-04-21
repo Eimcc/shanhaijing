@@ -5514,7 +5514,7 @@
         const searchHint = document.getElementById('searchHint');
         let searchTimer = null;
 
-        // 简易拼音首字母映射（常见姓氏/字）
+        // 简易拼音首字母映射
         const pinyinMap = {
             '九':'jiu','尾':'wei','狐':'hu','狰':'zheng','毕':'bi','方':'fang','帝':'di','江':'jiang',
             '穷':'qiong','奇':'qi','饕':'tao','餮':'tie','混':'hun','沌':'dun','蛊':'gu','雕':'diao',
