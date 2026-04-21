@@ -5508,6 +5508,169 @@
 
         mapClearBtn.addEventListener('click', clearMapFilter);
 
+        // ========== 模糊搜索 ==========
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        const searchHint = document.getElementById('searchHint');
+        let searchTimer = null;
+
+        // 简易拼音首字母映射（常见姓氏/字）
+        const pinyinMap = {
+            '九':'jiu','尾':'wei','狐':'hu','狰':'zheng','毕':'bi','方':'fang','帝':'di','江':'jiang',
+            '穷':'qiong','奇':'qi','饕':'tao','餮':'tie','混':'hun','沌':'dun','蛊':'gu','雕':'diao',
+            '鸣':'ming','蛇':'she','肥':'fei','遗':'yi','猼':'bo','訑':'yi','猾':'hua','褢':'huan',
+            '化':'hua','天':'tian','狗':'gou','英':'ying','招':'zhao','旋':'xuan','龟':'gui','鹿':'lu',
+            '蜀':'shu','类':'lei','灌':'guan','朱':'zhu','厌':'yan','蠃':'luo','鱼':'yu','数':'shu',
+            '斯':'si','鹦':'ying','鹉':'wu','孰':'shu','湖':'hu','人':'ren','相':'xiang','柳':'liu',
+            '乘':'cheng','黄':'huang','精':'jing','卫':'wei','烛':'zhu','龙':'long','巴':'ba',
+            '当':'dang','康':'kang','犰':'qiu','狳':'yu','蜚':'fei','驳':'bo','诸':'zhu','怀':'huai',
+            '梁':'liang','渠':'qu','白':'bai','泽':'ze','建':'jian','木':'mu','鸿':'hong','青':'qing',
+            '牛':'niu','鵸':'ji','鵌':'tu','狸':'li','力':'li','辟':'bi','邪':'xie','鸩':'zhen',
+            '狍':'pao','鸮':'xiao','獾':'huan','夸':'kua','父':'fu','象':'xiang','魑':'chi','魅':'mei',
+            '鼋':'yuan','牦':'mao','吉':'ji','量':'liang','狼':'lang','罴':'pi','飞':'fei','廉':'lian',
+            '貔':'pi','貅':'xiu','马':'ma','鸾':'luan','鸟':'niao','麒':'qi','麟':'lin','虎':'hu',
+            '文':'wen','鳐':'yao','婴':'ying','洞':'dong','冥':'ming','火':'huo','鼠':'shu','猕':'mi',
+            '猴':'hou','骥':'ji','沙':'sha','兽':'shou','雪':'xue','豹':'bao','凤':'feng','雏':'chu',
+            '黑':'hei','兔':'tu','狮':'shi','虹':'hong','蟒':'mang','玄':'xuan','比':'bi','翼':'yi',
+            '水':'shui','妹':'mei','旱':'han','魃':'ba','银':'yin','虫':'chong','冰':'bing','鬼':'gui',
+            '骑':'qi','鹰':'ying','月':'yue','山':'shan','神':'shen','童':'tong','海':'hai','雷':'lei',
+            '蘑':'mo','菇':'gu','树':'shu','灵':'ling','老':'lao','者':'zhe','花':'hua','魅':'mei',
+            '藤':'teng','风':'feng','灯':'deng','金':'jin','鸡':'ji','焰':'yan','木':'mu','石':'shi',
+            '魄':'po','星':'xing','云':'yun','年':'nian','雾':'wu','尘':'chen','猪':'zhu','墨':'mo',
+            '蓝':'lan','猿':'yuan','梦':'meng','湖':'hu','岩':'yan','寒':'han','泉':'quan','煞':'sha',
+            '仙':'xian','珠':'zhu','蚌':'bang','荆':'jing','棘':'ji','锦':'jin','鲤':'li','阳':'yang',
+            '余':'yu','烬':'jin','霜':'shuang','土':'tu','地':'di','瀑':'pu','瀑':'pu','沼':'zhao',
+            '竹':'zhu','松':'song','鹤':'he','獭':'ta','狼':'lang','熊':'xiong','猫':'mao','鲸':'jing',
+            '鹿':'lu','熊':'xiong','童':'tong','女':'nv','男':'nan','少':'shao','年':'nian','兽':'shou',
+            '独':'du','角':'jiao','熊':'xiong','幼':'you','崽':'zai','蝶':'die','鸮':'xiao','蝎':'xie',
+            '蛙':'wa','蜥':'xi','蜴':'yi','蝾':'rong','螈':'yuan','豹':'bao','鸮':'xiao','鸵':'tuo',
+            '凤':'feng','凰':'huang','夔':'kui','应':'ying','刑':'xing','并':'bing','封':'feng',
+            '开':'kai','明':'ming','驺':'zou','吾':'wu','禺':'yu','疆':'jiang','离':'li','獬':'xie',
+            '豸':'zhi','狌':'xing','赤':'chi','鱬':'ru','鴸':'zhu','长':'chang','右':'you','彘':'zhi',
+            '患':'huan','瞿':'qu','如':'ru','蛟':'jiao','颙':'yu','蛮':'man','钦':'qin','丕':'pi',
+            '鼓':'gu','陆':'lu','吾':'wu','蝼':'lou','原':'yuan','狡':'jiao','胜':'sheng','遇':'yu',
+            '雚':'huan','扈':'hu','冉':'ran','交':'jiao','鳋':'sao','滑':'hua','雚':'huan','疏':'shu',
+            '何':'he','罗':'luo','孟':'meng','槐':'huai','耳':'er','极':'ji','幽':'you','鴳':'yan',
+            '犍':'jian','那':'na','父':'fu','竦':'song','窫':'ya','窳':'yu','魈':'xiao','鮨':'yi',
+            '从':'cong','珠':'zhu','鳖':'bie','獳':'ru','獙':'bi','侄':'zhi','峳':'you','絜':'jie',
+            '钩':'gou','猲':'he','狙':'ju','鬿':'qi','誉':'yu','薄':'bo','合':'he','朏':'fei',
+            '夫':'fu','腹':'fu','犀':'xi','骄':'jiao','虫':'chong','计':'ji','蒙':'meng','跂':'qi',
+            '踵':'zhong','雍':'yong','和':'he','耕':'geng','勺':'shao','耕':'geng','獜':'lin',
+            '狙':'ju','闻':'wen','于':'yu','武':'wu','罗':'luo','泰':'tai','逢':'feng','鸓':'lei',
+            '葱':'cong','聋':'long','豪':'hao','彘':'zhi','溪':'xi','边':'bian','婴':'ying',
+        };
+
+        function getPinyinInitials(str) {
+            let result = '';
+            for (const char of str) {
+                if (pinyinMap[char]) {
+                    result += pinyinMap[char][0];
+                } else if (/[a-zA-Z]/.test(char)) {
+                    result += char.toLowerCase();
+                }
+            }
+            return result;
+        }
+
+        function fuzzyMatch(text, query) {
+            if (!query) return true;
+            const t = text.toLowerCase();
+            const q = query.toLowerCase();
+
+            // 1. 直接包含
+            if (t.includes(q)) return true;
+
+            // 2. 拼音首字母匹配
+            const tPinyin = getPinyinInitials(text);
+            if (tPinyin.includes(q)) return true;
+
+            // 3. 模糊匹配：每个字符顺序出现
+            let ti = 0;
+            for (let qi = 0; qi < q.length; qi++) {
+                const idx = t.indexOf(q[qi], ti);
+                if (idx === -1) {
+                    // 也尝试拼音首字母
+                    const pIdx = tPinyin.indexOf(q[qi], ti);
+                    if (pIdx === -1) return false;
+                    ti = pIdx + 1;
+                } else {
+                    ti = idx + 1;
+                }
+            }
+            return true;
+        }
+
+        function searchCreatures(query) {
+            if (!query.trim()) return null;
+
+            const q = query.trim();
+            return creatures.filter(c => {
+                // 搜索字段：名称、别名、类型、位置、简介
+                const fields = [
+                    c.name,
+                    c.alias,
+                    c.type,
+                    c.location,
+                    c.modernLocation,
+                    c.brief,
+                    c.appearance
+                ].filter(Boolean).join(' ');
+
+                return fuzzyMatch(fields, q);
+            });
+        }
+
+        function handleSearch() {
+            const query = searchInput.value.trim();
+            searchClear.style.display = query ? 'flex' : 'none';
+
+            if (!query) {
+                searchHint.textContent = '';
+                // 恢复之前的筛选状态
+                const activeTag = document.querySelector('.filter-tag.active');
+                const activeProvince = document.querySelector('.map-province.active');
+                if (activeProvince) {
+                    renderCardsByProvince(provinceMap[activeProvince.dataset.province]);
+                } else {
+                    renderCards(activeTag ? activeTag.dataset.filter : 'all');
+                }
+                return;
+            }
+
+            // 搜索时取消标签和地图高亮
+            document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.map-province.active').forEach(p => p.classList.remove('active'));
+
+            const results = searchCreatures(query);
+            if (results.length === 0) {
+                searchHint.textContent = `未找到与"${query}"相关的精怪`;
+                cardGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#b0a890;font-size:15px;">🔍 未找到匹配的精怪，换个关键词试试？</div>';
+                document.getElementById('visibleCount').textContent = '0';
+            } else {
+                searchHint.textContent = `找到 ${results.length} 只与"${query}"相关的精怪`;
+                startLazyRender(results);
+            }
+        }
+
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(handleSearch, 200);
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                searchInput.value = '';
+                handleSearch();
+                searchInput.blur();
+            }
+        });
+
+        searchClear.addEventListener('click', () => {
+            searchInput.value = '';
+            handleSearch();
+            searchInput.focus();
+        });
+
         // ========== 卡片渲染（标签筛选） ==========
         // ========== Render Cards ==========
         const cardGrid = document.getElementById('cardGrid');

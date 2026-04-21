@@ -255,9 +255,97 @@
             pointer-events: none;
         }
 
+/* ---------- 搜索框 ---------- */
+/* ========== Search ========== */
+.search-section {
+    position: relative;
+    z-index: 1;
+    max-width: 520px;
+    margin: 0 auto 16px;
+    padding: 0 20px;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(201, 169, 110, 0.3);
+    border-radius: 40px;
+    padding: 0 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.search-box:focus-within {
+    border-color: rgba(201, 169, 110, 0.6);
+    box-shadow: 0 4px 20px rgba(201, 169, 110, 0.15);
+}
+
+.search-icon {
+    font-size: 16px;
+    margin-right: 10px;
+    opacity: 0.5;
+    flex-shrink: 0;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 15px;
+    font-family: 'Noto Sans SC', sans-serif;
+    color: #3a3a2e;
+    padding: 12px 0;
+    line-height: 1.4;
+}
+
+.search-input::placeholder {
+    color: #b0a890;
+    font-size: 14px;
+}
+
+.search-clear {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: rgba(201, 169, 110, 0.15);
+    border-radius: 50%;
+    font-size: 13px;
+    color: #8a7e6b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin-left: 8px;
+}
+
+.search-clear:hover {
+    background: rgba(201, 169, 110, 0.3);
+    color: #5a5040;
+}
+
+.search-hint {
+    text-align: center;
+    font-size: 13px;
+    color: #b0a890;
+    margin-top: 8px;
+    min-height: 20px;
+    transition: opacity 0.3s ease;
+}
+
+.search-hint:empty {
+    opacity: 0;
+}
+
 /* ---------- 筛选标签 ---------- */
-        /* ========== Filter Tags ========== */
-        .filter-section {
+/* ========== Filter Tags ========== */
+.filter-section {
             position: relative;
             z-index: 1;
             display: flex;
