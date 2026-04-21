@@ -3736,9 +3736,10 @@
         // 获取缩略图路径（卡片列表用）
         function getThumbSrc(creature) {
             const src = getImageSrc(creature);
-            // 从 images/xxx.jpg 或 qqggimg/xxx.jpg 提取文件名
             const filename = src.split('/').pop();
-            return `thumbnails/${filename}`;
+            // 根据风格使用不同子目录，避免文件名冲突
+            const subDir = currentStyle === 'line' ? 'thumbnails/line' : 'thumbnails/ink';
+            return `${subDir}/${filename}`;
         }
 
         // ========== 分批懒加载 ==========
